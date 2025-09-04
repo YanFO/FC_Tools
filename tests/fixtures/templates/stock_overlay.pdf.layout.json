@@ -1,0 +1,49 @@
+{
+  "defaults": { 
+    "font": "NotoSansCJK-Regular", 
+    "size": 10, 
+    "color": "#000000" 
+  },
+  "fields": [
+    { 
+      "name": "company_name", 
+      "page": 0, 
+      "x": 72, 
+      "y": 96,  
+      "size": 14, 
+      "bold": true 
+    },
+    { 
+      "name": "ticker",       
+      "page": 0, 
+      "x": 72, 
+      "y": 120 
+    },
+    { 
+      "name": "price",        
+      "page": 0, 
+      "x": 72, 
+      "y": 144 
+    },
+    { 
+      "name": "market_cap",   
+      "page": 0, 
+      "x": 72, 
+      "y": 168 
+    },
+    { 
+      "name": "headline_1",   
+      "page": 1, 
+      "x": 72, 
+      "y": 96,  
+      "wrap": 440 
+    },
+    { 
+      "name": "headline_2",   
+      "page": 1, 
+      "x": 72, 
+      "y": 120, 
+      "wrap": 440 
+    }
+  ]
+}

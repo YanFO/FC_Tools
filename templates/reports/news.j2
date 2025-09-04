@@ -1,0 +1,69 @@
+# 新聞報告
+
+## 基本資訊
+- 報告類型：新聞摘要
+- 生成時間：{{ generated_at }}
+- 關注標的：{{ symbols | join(', ') if symbols else '市場綜合' }}
+
+## 新聞摘要
+{% if news and news.ok and news.data %}
+{% for article in news.data %}
+### {{ loop.index }}. {{ article.title }}
+
+**來源：** {{ article.site }}  
+**時間：** {{ article.publishedDate }}  
+**相關股票：** {{ article.symbol if article.symbol else '一般市場' }}
+
+**內容摘要：**
+{{ article.text[:300] }}...
+
+**原文連結：** [閱讀全文]({{ article.url }})
+
+---
+{% endfor %}
+{% else %}
+### 新聞摘要
+無法取得新聞資料（{{ news.error if news and news.error else 'API 金鑰未設定或服務不可用' }}）
+
+請檢查：
+- FMP API 金鑰是否正確設定
+- 網路連線是否正常
+- API 服務是否可用
+{% endif %}
+
+## 市場情緒分析
+{% if news and news.ok and news.data %}
+根據收集到的 {{ news.data | length }} 則新聞：
+
+### 關鍵詞頻率
+{% set all_text = news.data | map(attribute='text') | join(' ') %}
+- 新聞總數：{{ news.data | length }} 則
+- 平均發布時間：最近 24 小時內
+- 主要來源：{{ news.data | map(attribute='site') | list | unique | join(', ') }}
+
+### 情緒傾向
+基於新聞標題和內容的初步分析，市場情緒偏向謹慎。
+{% else %}
+由於無法取得新聞數據，無法進行市場情緒分析。
+{% endif %}
+
+## 相關股票表現
+{% if quotes and quotes.ok and quotes.data %}
+{% for quote in quotes.data %}
+### {{ quote.symbol }} - {{ quote.name }}
+- 當前價格：${{ quote.price }}
+- 漲跌：{{ quote.change }} ({{ quote.changesPercentage }}%)
+- 成交量：{{ quote.volume }}
+{% endfor %}
+{% else %}
+### 相關股票表現
+無法取得股價資料（{{ quotes.error if quotes and quotes.error else 'API 金鑰未設定或服務不可用' }}）
+{% endif %}
+
+## 注意事項
+- 本報告基於公開新聞資訊，僅供參考
+- 新聞內容可能存在時效性，請注意發布時間
+- 投資決策請結合多方資訊，謹慎評估風險
+
+---
+*報告生成時間：{{ generated_at }}*

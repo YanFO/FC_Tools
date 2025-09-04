@@ -1,0 +1,126 @@
+{# 市場快訊報告模板 - 提供股票、總經數據與新聞的綜合分析 #}
+# 市場快訊報告
+
+**生成時間：** {{ generated_at | format_date("%Y-%m-%d %H:%M:%S") }}  
+**報告 ID：** {{ report_id }}  
+**資料來源：** FMP API, OpenAI  
+
+---
+
+## 執行摘要
+
+{% if summary %}
+{{ summary }}
+{% else %}
+本報告整合了最新的市場數據、公司基本面資訊與相關新聞，為投資決策提供參考依據。
+{% endif %}
+
+---
+
+## 股票分析
+
+{% if stocks and stocks|length > 0 %}
+{% for stock in stocks %}
+### {{ stock.symbol }} - {{ stock.name or "N/A" }}
+
+**基本資訊**
+- **當前價格：** ${{ stock.price | format_number(2) }}
+- **漲跌幅：** {{ stock.change | format_number(2) }} ({{ stock.changesPercentage | format_percentage(2) }})
+- **日內區間：** ${{ stock.dayLow | format_number(2) }} - ${{ stock.dayHigh | format_number(2) }}
+- **成交量：** {{ stock.volume | format_number(0) }}
+
+{% if stock.profile %}
+**公司概況**
+- **行業：** {{ stock.profile.industry or "N/A" }}
+- **板塊：** {{ stock.profile.sector or "N/A" }}
+- **市值：** ${{ stock.profile.marketCap | format_number(0) }}
+- **員工數：** {{ stock.profile.employees | format_number(0) }}
+- **國家：** {{ stock.profile.country or "N/A" }}
+
+**公司描述**
+{{ stock.profile.description | truncate_text(300) }}
+{% endif %}
+
+{% if stock.news and stock.news|length > 0 %}
+**相關新聞**
+{% for news in stock.news[:3] %}
+- **{{ news.publishedDate | format_date }}** - [{{ news.title }}]({{ news.url }})
+  {{ news.text | truncate_text(150) }}
+{% endfor %}
+{% endif %}
+
+---
+{% endfor %}
+{% else %}
+*本報告未包含個股分析資料*
+{% endif %}
+
+## 總體經濟數據
+
+{% if macro_data and macro_data|length > 0 %}
+{% for indicator in macro_data %}
+### {{ indicator.indicator | upper }} - {{ indicator.country }}
+
+{% if indicator.data and indicator.data|length > 0 %}
+| 日期 | 數值 | 單位 |
+|------|------|------|
+{% for data_point in indicator.data[:5] %}
+| {{ data_point.date | format_date }} | {{ data_point.value | format_number(2) }} | {{ data_point.unit or "-" }} |
+{% endfor %}
+
+**最新數值：** {{ indicator.data[0].value | format_number(2) }} {{ indicator.data[0].unit or "" }} ({{ indicator.data[0].date | format_date }})
+{% else %}
+*暫無 {{ indicator.indicator }} 數據*
+{% endif %}
+
+---
+{% endfor %}
+{% else %}
+*本報告未包含總體經濟數據*
+{% endif %}
+
+## 市場新聞摘要
+
+{% if market_news and market_news|length > 0 %}
+{% for news in market_news[:10] %}
+### {{ news.publishedDate | format_date }} - {{ news.title }}
+
+**來源：** {{ news.site or "Unknown" }}  
+**相關股票：** {{ news.symbol or "市場綜合" }}
+
+{{ news.text | truncate_text(200) }}
+
+[閱讀全文]({{ news.url }})
+
+---
+{% endfor %}
+{% else %}
+*本報告未包含市場新聞*
+{% endif %}
+
+## 風險提示
+
+⚠️ **重要聲明**
+- 本報告僅供參考，不構成投資建議
+- 股票投資存在風險，過往表現不代表未來結果
+- 請根據個人風險承受能力做出投資決策
+- 建議諮詢專業財務顧問
+
+## 資料來源與免責聲明
+
+**資料來源：**
+{% if sources and sources|length > 0 %}
+{% for source in sources %}
+- {{ source.source }} ({{ source.timestamp | format_date }})
+{% endfor %}
+{% else %}
+- Financial Modeling Prep (FMP) API
+- OpenAI GPT 模型分析
+{% endif %}
+
+**免責聲明：**
+本報告基於公開資料與 AI 分析生成，資料準確性可能受到市場變動、資料延遲等因素影響。使用者應自行驗證資料準確性，並承擔投資風險。
+
+---
+
+*報告生成於 {{ generated_at | format_date("%Y-%m-%d %H:%M:%S") }} | 模板版本：market_brief v1.0*

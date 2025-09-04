@@ -1,0 +1,90 @@
+# 自訂報告
+
+## 基本資訊
+- 報告類型：自訂分析
+- 生成時間：{{ generated_at }}
+- 查詢內容：{{ query if query else '自訂報告' }}
+
+## 查詢結果
+{% if rag and rag.ok and rag.data %}
+### 文件檢索結果
+
+**問題：** {{ rag.data.question }}
+
+**回答：**
+{{ rag.data.answer }}
+
+### 參考來源
+{% for source in rag.data.sources %}
+- {{ source }}
+{% endfor %}
+
+### 檢索統計
+- 使用文件片段：{{ rag.data.chunks_used }} 個
+- 內容長度：{{ rag.data.context_length }} 字元
+{% else %}
+### 查詢結果
+無法取得文件檢索結果（{{ rag.error if rag and rag.error else '向量資料庫未建立或查詢失敗' }}）
+
+可能原因：
+- 尚未上傳相關文件
+- 向量資料庫未初始化
+- OpenAI API 金鑰未設定
+- 查詢內容過於簡短
+{% endif %}
+
+## 相關市場資訊
+{% if symbols %}
+### 相關股票
+{% if quotes and quotes.ok and quotes.data %}
+{% for quote in quotes.data %}
+#### {{ quote.symbol }} - {{ quote.name }}
+- 當前價格：${{ quote.price }}
+- 漲跌：{{ quote.change }} ({{ quote.changesPercentage }}%)
+- 成交量：{{ quote.volume }}
+{% endfor %}
+{% else %}
+無法取得股價資料（{{ quotes.error if quotes and quotes.error else 'API 金鑰未設定' }}）
+{% endif %}
+{% endif %}
+
+{% if news and news.ok and news.data %}
+### 相關新聞
+{% for article in news.data[:3] %}
+#### {{ article.title }}
+- 來源：{{ article.site }}
+- 時間：{{ article.publishedDate }}
+- 摘要：{{ article.text[:150] }}...
+- 連結：[閱讀全文]({{ article.url }})
+{% endfor %}
+{% endif %}
+
+## 分析建議
+{% if rag and rag.ok and rag.data %}
+基於文件檢索的結果，建議：
+
+1. **深入研究**：參考上述來源文件進行更詳細的分析
+2. **交叉驗證**：結合其他資訊來源驗證結論
+3. **持續追蹤**：關注相關領域的最新發展
+{% else %}
+由於無法取得有效的檢索結果，建議：
+
+1. **上傳相關文件**：將需要分析的文件上傳至系統
+2. **重新描述問題**：使用更具體的關鍵詞重新查詢
+3. **檢查設定**：確認 API 金鑰和系統設定正確
+{% endif %}
+
+## 技術說明
+- **檢索方式**：向量相似度搜尋
+- **模型**：OpenAI Embedding + GPT
+- **資料來源**：本地上傳文件
+- **更新頻率**：即時
+
+## 注意事項
+- 本報告基於已上傳的文件內容生成
+- 分析結果的準確性取決於原始文件的品質
+- 建議結合專業知識進行判斷
+- 如需更新分析，請重新上傳最新文件
+
+---
+*報告生成時間：{{ generated_at }}*

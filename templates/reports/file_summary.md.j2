@@ -1,0 +1,211 @@
+{# 檔案摘要報告模板 - 提供文件內容分析與重點摘要 #}
+# 檔案分析報告
+
+**生成時間：** {{ generated_at | format_date("%Y-%m-%d %H:%M:%S") }}  
+**報告 ID：** {{ report_id }}  
+**分析檔案：** {{ file_info.name if file_info else "未知檔案" }}
+
+---
+
+## 檔案基本資訊
+
+{% if file_info %}
+| 項目 | 內容 |
+|------|------|
+| **檔案名稱** | {{ file_info.name }} |
+| **檔案路徑** | {{ file_info.path }} |
+| **檔案大小** | {{ file_info.size | format_number(0) }} bytes |
+| **檔案類型** | {{ file_info.type | upper }} |
+| **頁數/章節** | {{ file_info.page_count or 1 }} |
+| **處理時間** | {{ generated_at | format_date("%Y-%m-%d %H:%M:%S") }} |
+{% else %}
+*檔案資訊不可用*
+{% endif %}
+
+---
+
+## 內容摘要
+
+{% if content_summary %}
+{{ content_summary }}
+{% else %}
+### 文件概述
+
+{% if file_info and file_info.content %}
+本文件包含 {{ file_info.content | length }} 個字元的內容。以下是基於文件內容的分析摘要：
+
+{{ file_info.content | truncate_text(500) }}
+{% else %}
+*無法取得文件內容摘要*
+{% endif %}
+{% endif %}
+
+---
+
+## 關鍵重點
+
+{% if key_points and key_points|length > 0 %}
+{% for point in key_points %}
+{{ loop.index }}. {{ point }}
+{% endfor %}
+{% else %}
+### 自動提取的重點
+
+{% if chunks and chunks|length > 0 %}
+基於文件分塊分析，以下是識別出的重要內容片段：
+
+{% for chunk in chunks[:5] %}
+#### 片段 {{ loop.index }}
+{{ chunk.text | truncate_text(200) }}
+
+*來源：第 {{ chunk.start_char }}-{{ chunk.end_char }} 字元*
+
+---
+{% endfor %}
+{% else %}
+*無法提取關鍵重點*
+{% endif %}
+{% endif %}
+
+## 詳細分析
+
+{% if detailed_analysis %}
+{{ detailed_analysis }}
+{% else %}
+### 內容結構分析
+
+{% if metadata %}
+**文件元資料：**
+{% if metadata.title %}
+- **標題：** {{ metadata.title }}
+{% endif %}
+{% if metadata.author %}
+- **作者：** {{ metadata.author }}
+{% endif %}
+{% if metadata.subject %}
+- **主題：** {{ metadata.subject }}
+{% endif %}
+{% if metadata.pages %}
+- **總頁數：** {{ metadata.pages | length }}
+{% endif %}
+{% if metadata.paragraphs %}
+- **段落數：** {{ metadata.paragraphs }}
+{% endif %}
+{% if metadata.tables %}
+- **表格數：** {{ metadata.tables }}
+{% endif %}
+{% endif %}
+
+### 內容分佈
+
+{% if chunks and chunks|length > 0 %}
+文件已分為 {{ chunks|length }} 個內容塊進行分析：
+
+| 塊編號 | 字元範圍 | 長度 | 內容預覽 |
+|--------|----------|------|----------|
+{% for chunk in chunks[:10] %}
+| {{ chunk.id + 1 }} | {{ chunk.start_char }}-{{ chunk.end_char }} | {{ chunk.length }} | {{ chunk.text[:50] }}... |
+{% endfor %}
+{% if chunks|length > 10 %}
+| ... | ... | ... | *還有 {{ chunks|length - 10 }} 個內容塊* |
+{% endif %}
+{% endif %}
+{% endif %}
+
+---
+
+## 問答分析
+
+{% if qa_results and qa_results|length > 0 %}
+基於文件內容的問答分析：
+
+{% for qa in qa_results %}
+### Q: {{ qa.question }}
+
+**A:** {{ qa.answer }}
+
+{% if qa.sources and qa.sources|length > 0 %}
+**參考來源：**
+{% for source in qa.sources %}
+- {{ source.file_name }} (第 {{ source.chunk_id + 1 }} 塊，字元 {{ source.start_char }}-{{ source.end_char }})
+{% endfor %}
+{% endif %}
+
+---
+{% endfor %}
+{% else %}
+*本報告未包含問答分析*
+
+如需針對文件內容提問，請使用 Agent 的 file QA 功能。
+{% endif %}
+
+## 相關建議
+
+{% if recommendations and recommendations|length > 0 %}
+{% for recommendation in recommendations %}
+{{ loop.index }}. {{ recommendation }}
+{% endfor %}
+{% else %}
+### 使用建議
+
+基於文件分析結果，建議：
+
+1. **深度閱讀：** 重點關注上述關鍵重點部分
+2. **交叉驗證：** 如涉及數據或事實，建議查證原始來源
+3. **結構化筆記：** 可依據內容分塊建立結構化筆記
+4. **後續查詢：** 如有具體問題，可使用 QA 功能進一步查詢
+
+{% if file_info and file_info.type == '.pdf' %}
+**PDF 特別提醒：**
+- 文字提取可能受 PDF 格式影響，建議核對重要資訊
+- 如包含圖表，文字分析可能無法完整呈現視覺內容
+{% endif %}
+
+{% if file_info and file_info.type == '.docx' %}
+**DOCX 特別提醒：**
+- 已包含表格內容分析
+- 格式化資訊（如粗體、斜體）在文字分析中可能遺失
+{% endif %}
+{% endif %}
+
+---
+
+## 技術資訊
+
+**處理統計：**
+{% if processing_stats %}
+- **處理時間：** {{ processing_stats.processing_time }}秒
+- **分塊數量：** {{ processing_stats.chunk_count }}
+- **嵌入向量：** {{ processing_stats.embeddings_created }}個
+- **相似度搜尋：** {{ processing_stats.similarity_searches }}次
+{% else %}
+- **分塊數量：** {{ chunks|length if chunks else 0 }}
+- **總字元數：** {{ file_info.content|length if file_info and file_info.content else 0 }}
+- **分析模型：** GPT-4o-mini
+- **嵌入模型：** text-embedding-3-small
+{% endif %}
+
+**資料來源：**
+{% if sources and sources|length > 0 %}
+{% for source in sources %}
+- {{ source.source }} ({{ source.timestamp | format_date }})
+{% endfor %}
+{% else %}
+- 檔案內容分析：OpenAI GPT 模型
+- 向量嵌入：OpenAI Embedding API
+- 文件處理：PyPDF / python-docx
+{% endif %}
+
+---
+
+## 免責聲明
+
+⚠️ **重要提醒**
+- 本分析基於 AI 模型自動生成，可能存在理解偏差
+- 重要資訊請以原始文件為準
+- 文字提取的準確性可能受檔案格式與品質影響
+- 建議人工審核關鍵內容
+
+---
+
+*報告生成於 {{ generated_at | format_date("%Y-%m-%d %H:%M:%S") }} | 模板版本：file_summary v1.0*

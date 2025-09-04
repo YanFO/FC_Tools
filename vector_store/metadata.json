@@ -1,0 +1,68 @@
+[
+  {
+    "chunk_id": 0,
+    "text": "第一段",
+    "start_char": 0,
+    "end_char": 10,
+    "length": 10,
+    "file_path": "/test/file.txt",
+    "file_name": "file.txt",
+    "file_type": ".txt",
+    "created_at": null
+  },
+  {
+    "chunk_id": 1,
+    "text": "第二段",
+    "start_char": 11,
+    "end_char": 20,
+    "length": 9,
+    "file_path": "/test/file.txt",
+    "file_name": "file.txt",
+    "file_type": ".txt",
+    "created_at": null
+  },
+  {
+    "chunk_id": 0,
+    "text": "第一段",
+    "start_char": 0,
+    "end_char": 10,
+    "length": 10,
+    "file_path": "/test/file.txt",
+    "file_name": "file.txt",
+    "file_type": ".txt",
+    "created_at": null
+  },
+  {
+    "chunk_id": 1,
+    "text": "第二段",
+    "start_char": 11,
+    "end_char": 20,
+    "length": 9,
+    "file_path": "/test/file.txt",
+    "file_name": "file.txt",
+    "file_type": ".txt",
+    "created_at": null
+  },
+  {
+    "chunk_id": 0,
+    "text": "第一段",
+    "start_char": 0,
+    "end_char": 10,
+    "length": 10,
+    "file_path": "/test/file.txt",
+    "file_name": "file.txt",
+    "file_type": ".txt",
+    "created_at": null
+  },
+  {
+    "chunk_id": 1,
+    "text": "第二段",
+    "start_char": 11,
+    "end_char": 20,
+    "length": 9,
+    "file_path": "/test/file.txt",
+    "file_name": "file.txt",
+    "file_type": ".txt",
+    "created_at": null
+  }
+]

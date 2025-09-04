@@ -1,0 +1,106 @@
+/* WeasyPrint PDF 預設樣式 */
+
+@page {
+    size: A4;
+    margin: 2cm;
+    
+    /* 頁眉 */
+    @top-center {
+        content: "Lens Qunat";
+        font-family: Arial, sans-serif;
+        font-size: 12pt;
+        color: #666;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5pt;
+    }
+    
+    /* 頁碼 */
+    @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: Arial, sans-serif;
+        font-size: 10pt;
+        color: #666;
+    }
+}
+
+/* 浮水印 */
+body::before {
+    content: "Lens Qunat";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 72pt;
+    color: rgba(200, 200, 200, 0.3);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* 基本樣式 */
+body {
+    font-family: "Noto Sans CJK TC", Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+h1 {
+    font-size: 24pt;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.3em;
+}
+
+h2 {
+    font-size: 20pt;
+    color: #3498db;
+}
+
+h3 {
+    font-size: 16pt;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8pt;
+    text-align: left;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.highlight {
+    background-color: #fff3cd;
+    padding: 0.5em;
+    border-left: 4px solid #ffc107;
+    margin: 1em 0;
+}
+
+.summary {
+    background-color: #e7f3ff;
+    padding: 1em;
+    border-radius: 5pt;
+    margin: 1em 0;
+}
+
+/* 分頁控制 */
+.page-break {
+    page-break-before: always;
+}
+
+.no-break {
+    page-break-inside: avoid;
+}

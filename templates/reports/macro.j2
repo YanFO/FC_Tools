@@ -1,0 +1,57 @@
+# 總經報告
+
+## 基本資訊
+- 報告類型：總體經濟分析
+- 生成時間：{{ generated_at }}
+- 分析指標：{{ indicators | join(', ') if indicators else '主要經濟指標' }}
+
+## 經濟指標數據
+{% if macro and macro.ok and macro.data %}
+{% for indicator, data_list in macro.data.items() %}
+### {{ indicator }}
+{% if data_list %}
+| 日期 | 數值 | 單位 |
+|------|------|------|
+{% for item in data_list[:6] %}
+| {{ item.date }} | {{ item.value }} | {{ item.unit }} |
+{% endfor %}
+{% else %}
+無可用數據
+{% endif %}
+{% endfor %}
+{% else %}
+### 經濟指標數據
+無法取得總經數據（{{ macro.error if macro and macro.error else 'API 金鑰未設定或服務不可用' }}）
+{% endif %}
+
+## 數據分析
+{% if macro and macro.ok and macro.data %}
+根據最新的經濟數據：
+{% for indicator, data_list in macro.data.items() %}
+{% if data_list %}
+- **{{ indicator }}**：最新數值為 {{ data_list[0].value }} {{ data_list[0].unit }}（{{ data_list[0].date }}）
+{% endif %}
+{% endfor %}
+{% else %}
+由於無法取得經濟數據，無法進行分析。
+{% endif %}
+
+## 相關新聞
+{% if news and news.ok and news.data %}
+{% for article in news.data[:3] %}
+### {{ article.title }}
+- 來源：{{ article.site }}
+- 時間：{{ article.publishedDate }}
+- 摘要：{{ article.text[:150] }}...
+- 連結：[閱讀全文]({{ article.url }})
+{% endfor %}
+{% else %}
+### 相關新聞
+無法取得相關新聞（{{ news.error if news and news.error else 'API 金鑰未設定或服務不可用' }}）
+{% endif %}
+
+## 注意事項
+本報告由 AI 系統自動生成，僅供參考。經濟數據可能存在延遲，請以官方發布為準。
+
+---
+*報告生成時間：{{ generated_at }}*

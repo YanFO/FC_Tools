@@ -1,0 +1,158 @@
+# 股票報告
+
+## 基本資訊
+- 報告類型：股票分析
+- 生成時間：{{ generated_at }}
+- 股票代號：{{ symbols | join(', ') if symbols else '無' }}
+
+## 股價資訊
+{% if quotes and quotes.ok and quotes.data %}
+{% for quote in quotes.data %}
+### {{ quote.symbol }} - {{ quote.name }}
+- 當前價格：${{ quote.price }}
+- 漲跌：{{ quote.change }} ({{ quote.changesPercentage }}%)
+- 日內區間：${{ quote.dayLow }} - ${{ quote.dayHigh }}
+- 成交量：{{ quote.volume }}
+- 更新時間：{{ quote.timestamp }}
+{% endfor %}
+{% else %}
+### 股價資訊
+無法取得股價資料（{{ quotes.error if quotes and quotes.error else 'API 金鑰未設定或服務不可用' }}）
+
+可能原因：
+- FMP API 金鑰未設定或無效
+- 股票代號不正確
+- API 服務暫時不可用
+{% endif %}
+
+## 公司基本面
+{% if profiles and profiles.ok and profiles.data %}
+{% for profile in profiles.data %}
+### {{ profile.symbol }} - {{ profile.companyName }}
+- 產業：{{ profile.industry }}
+- 市值：${{ profile.mktCap | default('N/A') }}
+- 員工數：{{ profile.fullTimeEmployees | default('N/A') }}
+- 總部：{{ profile.city }}, {{ profile.country }}
+- 網站：{{ profile.website }}
+- 描述：{{ profile.description[:200] }}...
+{% endfor %}
+{% else %}
+### 公司基本面
+無法取得公司基本面資料（{{ profiles.error if profiles and profiles.error else 'API 金鑰未設定或服務不可用' }}）
+{% endif %}
+
+## 相關新聞
+{% if news and news.ok and news.data %}
+{% for article in news.data[:5] %}
+### {{ loop.index }}. {{ article.title }}
+- 來源：{{ article.site }}
+- 時間：{{ article.publishedDate }}
+- 摘要：{{ article.text[:150] }}...
+- 連結：[閱讀全文]({{ article.url }})
+
+---
+{% endfor %}
+{% else %}
+### 相關新聞
+無法取得新聞資料（{{ news.error if news and news.error else 'API 金鑰未設定或服務不可用' }}）
+{% endif %}
+
+## 投資建議
+{% if quotes and quotes.ok and quotes.data %}
+基於當前市場數據：
+{% for quote in quotes.data %}
+- **{{ quote.symbol }}**：當前價格 ${{ quote.price }}，{{ '上漲' if quote.change > 0 else '下跌' if quote.change < 0 else '持平' }} {{ quote.changesPercentage }}%
+{% endfor %}
+
+**風險提醒：** 股市投資存在風險，過往表現不代表未來結果。
+{% else %}
+由於無法取得股價數據，無法提供具體投資建議。
+{% endif %}
+
+## 🤖 AI 智能分析
+{% if llm_analysis or market_analysis or fundamental_analysis %}
+### 市場分析
+{{ market_analysis | default('基於可用資料進行分析，詳細市場分析需要更多資料源支援。') }}
+
+### 基本面分析
+{{ fundamental_analysis | default('基本面分析需要更完整的公司財務資料。') }}
+
+### 新聞影響評估
+{{ news_impact | default('新聞影響評估需要相關新聞資料支援。') }}
+
+### 投資建議
+{{ investment_recommendation | default('建議投資者結合多方資訊，謹慎評估投資機會。') }}
+
+### 風險評估
+{{ risk_assessment | default('投資有風險，建議分散投資並密切關注市場變化。') }}
+
+### 關鍵洞察
+{% if key_insights and key_insights|length > 0 %}
+{% for insight in key_insights %}
+- {{ insight }}
+{% endfor %}
+{% else %}
+- 基於當前可用資料的分析結果
+- 建議結合專業分析師意見進行決策
+- 持續關注市場動態和公司基本面變化
+{% endif %}
+
+### AI 原始分析
+{% if llm_analysis %}
+```json
+{{ llm_analysis | tojson(indent=2) if llm_analysis is mapping else llm_analysis }}
+```
+{% else %}
+```json
+{
+  "analysis_status": "基礎分析模式",
+  "data_sources": "基於可用的股價、新聞和公司資料",
+  "note": "完整的 AI 分析需要更多資料源支援"
+}
+```
+{% endif %}
+{% else %}
+### 市場分析
+基於可用資料進行分析，詳細市場分析需要更多資料源支援。
+
+### 基本面分析
+基本面分析需要更完整的公司財務資料。
+
+### 新聞影響評估
+新聞影響評估需要相關新聞資料支援。
+
+### 投資建議
+建議投資者結合多方資訊，謹慎評估投資機會。
+
+### 風險評估
+投資有風險，建議分散投資並密切關注市場變化。
+
+### 關鍵洞察
+- 基於當前可用資料的分析結果
+- 建議結合專業分析師意見進行決策
+- 持續關注市場動態和公司基本面變化
+
+### AI 原始分析
+```json
+{
+  "analysis_status": "基礎分析模式",
+  "data_sources": "基於可用的股價、新聞和公司資料",
+  "note": "完整的 AI 分析需要更多資料源支援"
+}
+```
+{% endif %}
+
+## 注意事項
+- 本報告由 AI 系統自動生成，僅供參考
+- 投資有風險，請謹慎決策
+- 建議結合專業分析師意見
+- 數據可能存在延遲，請以實時報價為準
+{% if has_data_limitations %}
+- {{ data_limitations_note }}
+{% endif %}
+{% if data_source_status %}
+- 資料源狀態：RAG檢索{{ '可用' if data_source_status.rag_available else '不可用' }}，市場資料{{ '可用' if data_source_status.fmp_available else '不可用' }}
+{% endif %}
+
+---
+*報告生成時間：{{ generated_at }}*
